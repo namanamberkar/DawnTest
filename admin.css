@@ -613,3 +613,96 @@ body {
 .settings-grid {
   max-width: 600px;
 }
+
+/* WIDER MODAL FOR PRODUCT EDITOR */
+.modal-card-wide {
+  max-width: 780px;
+}
+
+/* FORM SECTION DIVIDERS */
+.form-section-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  margin-top: 24px;
+}
+
+.form-section-label:first-child {
+  margin-top: 0;
+}
+
+.form-help-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+/* SIZE CHECKBOX GRID */
+.size-checkbox-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.size-check-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-color);
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: var(--transition-normal);
+  user-select: none;
+}
+
+.size-check-item:hover {
+  border-color: var(--border-dark);
+}
+
+.size-check-item input[type="checkbox"] {
+  accent-color: var(--text-color);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.size-check-item input[type="checkbox"]:checked + span {
+  font-weight: 700;
+}
+
+/* CUSTOM SIZE INLINE ADD ROW */
+.inline-add-row {
+  display: flex;
+  gap: 8px;
+}
+
+.inline-add-row input {
+  flex: 1;
+}
+
+.btn-sm {
+  padding: 8px 14px;
+  font-size: 12px;
+}
+
+/* IMAGE PREVIEW */
+.img-preview-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.img-preview-row img {
+  width: 48px;
+  height: 60px;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+}

@@ -13,6 +13,23 @@ let authenticated = false;
 window.addEventListener("DOMContentLoaded", () => {
   lucide.createIcons();
   checkSession();
+
+  // Category custom field toggle
+  document.getElementById("prod-category").addEventListener("change", function() {
+    const customGroup = document.getElementById("custom-category-group");
+    customGroup.style.display = this.value === "__custom__" ? "block" : "none";
+  });
+
+  // Cover image preview
+  document.getElementById("prod-cover").addEventListener("input", function() {
+    const preview = document.getElementById("cover-preview");
+    const url = this.value.trim();
+    if (url.startsWith("http")) {
+      preview.innerHTML = `<img src="${url}" alt="Preview" onerror="this.style.display='none'">`;
+    } else {
+      preview.innerHTML = "";
+    }
+  });
 });
 
 // ── SESSION MANAGEMENT ───────────────────────────────────────────
@@ -100,6 +117,85 @@ function handleLogout() {
   authenticated = false;
   location.reload();
 }
+
+// ── SIZE CHECKBOX HELPERS ────────────────────────────────────────
+function getSelectedSizes() {
+  const checkboxes = document.querySelectorAll('input[name="prod-size"]:checked');
+  return Array.from(checkboxes).map(cb => cb.value).join(", ");
+}
+
+function setSizeCheckboxes(sizesString) {
+  // Uncheck all first
+  document.querySelectorAll('input[name="prod-size"]').forEach(cb => {
+    cb.checked = false;
+  });
+
+  if (!sizesString) return;
+
+  const sizes = sizesString.split(",").map(s => s.trim());
+  sizes.forEach(size => {
+    // Try matching an existing checkbox
+    const existing = document.querySelector(`input[name="prod-size"][value="${size}"]`);
+    if (existing) {
+      existing.checked = true;
+    } else if (size) {
+      // Add a custom checkbox for this size
+      addSizeCheckbox(size);
+    }
+  });
+}
+
+function addSizeCheckbox(value) {
+  const grid = document.getElementById("size-checkbox-grid");
+  const label = document.createElement("label");
+  label.className = "size-check-item";
+  label.innerHTML = `<input type="checkbox" name="prod-size" value="${value}" checked> <span>${value}</span>`;
+  grid.appendChild(label);
+}
+
+function addCustomSize() {
+  const input = document.getElementById("prod-custom-size");
+  const val = input.value.trim();
+  if (!val) return;
+
+  // Check for duplicates
+  const existing = document.querySelector(`input[name="prod-size"][value="${val}"]`);
+  if (existing) {
+    existing.checked = true;
+    input.value = "";
+    return;
+  }
+
+  addSizeCheckbox(val);
+  input.value = "";
+}
+
+// ── CATEGORY HELPERS ─────────────────────────────────────────────
+function getSelectedCategory() {
+  const select = document.getElementById("prod-category");
+  if (select.value === "__custom__") {
+    return document.getElementById("prod-category-custom").value.trim() || "Uncategorized";
+  }
+  return select.value;
+}
+
+function setCategoryValue(category) {
+  const select = document.getElementById("prod-category");
+  const customGroup = document.getElementById("custom-category-group");
+
+  // Check if the category matches one of the preset options
+  const options = Array.from(select.options).map(o => o.value);
+  if (options.includes(category)) {
+    select.value = category;
+    customGroup.style.display = "none";
+  } else {
+    // It's a custom category
+    select.value = "__custom__";
+    customGroup.style.display = "block";
+    document.getElementById("prod-category-custom").value = category;
+  }
+}
+
 
 // ── NAVIGATION ───────────────────────────────────────────────────
 function switchAdminTab(tabId) {
@@ -323,9 +419,11 @@ function openAddProductModal() {
   document.getElementById("product-form").reset();
   
   // Set default values
-  document.getElementById("prod-sizes").value = "Free Size";
+  setSizeCheckboxes("Free Size");
+  setCategoryValue("Kanchipuram");
   document.getElementById("prod-care").value = "Dry Clean Only";
   document.getElementById("prod-blouse").value = "Blouse piece included";
+  document.getElementById("cover-preview").innerHTML = "";
   
   document.getElementById("product-modal").classList.add("show");
 }
@@ -338,11 +436,19 @@ function openEditProductModal(id) {
   document.getElementById("edit-product-id").value = p.id;
   
   document.getElementById("prod-name").value = p.name || "";
-  document.getElementById("prod-category").value = p.category || "Kanchipuram";
+  setCategoryValue(p.category || "Kanchipuram");
   document.getElementById("prod-tagline").value = p.tagline || "";
   document.getElementById("prod-price").value = p.price || 0;
   document.getElementById("prod-discount").value = p.discount_price || "";
-  document.getElementById("prod-cover").value = p.image_url || "";
+  
+  const coverUrl = p.image_url || "";
+  document.getElementById("prod-cover").value = coverUrl;
+  const coverPreview = document.getElementById("cover-preview");
+  if (coverUrl.startsWith("http")) {
+    coverPreview.innerHTML = `<img src="${coverUrl}" alt="Preview" onerror="this.style.display='none'">`;
+  } else {
+    coverPreview.innerHTML = "";
+  }
   
   // Format gallery images
   let galleryUrls = "";
@@ -360,7 +466,7 @@ function openEditProductModal(id) {
   
   document.getElementById("prod-badge").value = p.badge || "";
   document.getElementById("prod-stock").value = p.stock || "In Stock";
-  document.getElementById("prod-sizes").value = p.sizes || "Free Size";
+  setSizeCheckboxes(p.sizes || "Free Size");
   document.getElementById("prod-blouse").value = p.blouse || p.blouse_info || "Blouse piece included";
   document.getElementById("prod-desc").value = p.description || "";
   document.getElementById("prod-care").value = p.fabric_care || "Dry Clean Only";
@@ -389,7 +495,7 @@ async function saveProduct(event) {
 
   const productData = {
     name: document.getElementById("prod-name").value.trim(),
-    category: document.getElementById("prod-category").value,
+    category: getSelectedCategory(),
     tagline: document.getElementById("prod-tagline").value.trim(),
     price: Number(document.getElementById("prod-price").value),
     discount_price: document.getElementById("prod-discount").value ? Number(document.getElementById("prod-discount").value) : "",
@@ -397,7 +503,7 @@ async function saveProduct(event) {
     gallery_images: JSON.stringify(galleryList),
     badge: document.getElementById("prod-badge").value.trim(),
     stock: document.getElementById("prod-stock").value,
-    sizes: document.getElementById("prod-sizes").value.trim(),
+    sizes: getSelectedSizes(),
     blouse_info: document.getElementById("prod-blouse").value.trim(),
     description: document.getElementById("prod-desc").value.trim(),
     fabric_care: document.getElementById("prod-care").value.trim()

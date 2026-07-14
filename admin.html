@@ -211,7 +211,7 @@
 
   <!-- PRODUCT EDITOR DIALOG MODAL -->
   <div id="product-modal" class="modal">
-    <div class="modal-card">
+    <div class="modal-card modal-card-wide">
       <div class="modal-card-header">
         <h3 id="modal-product-title">Add New Saree</h3>
         <button class="btn-clear" onclick="closeProductModal()"><i data-lucide="x"></i></button>
@@ -219,21 +219,35 @@
       <form id="product-form" onsubmit="saveProduct(event)">
         <input type="hidden" id="edit-product-id">
         <div class="modal-body">
+
+          <!-- SECTION 1: Basic Info -->
+          <div class="form-section-label">Basic Information</div>
+
           <div class="modal-row">
             <div class="form-group">
               <label for="prod-name">Saree Name*</label>
               <input type="text" id="prod-name" required placeholder="e.g. Kanchipuram Silk Saree">
             </div>
             <div class="form-group">
-              <label for="prod-category">Category/Fabric Type*</label>
+              <label for="prod-category">Category / Fabric Type*</label>
               <select id="prod-category" required>
                 <option value="Kanchipuram">Kanchipuram</option>
                 <option value="Banarasi">Banarasi</option>
                 <option value="Organza">Organza</option>
                 <option value="Georgette">Georgette</option>
                 <option value="Silk">Silk</option>
+                <option value="Tussar">Tussar</option>
+                <option value="Cotton">Cotton</option>
+                <option value="Linen">Linen</option>
+                <option value="Chiffon">Chiffon</option>
+                <option value="__custom__">+ Add Custom Category</option>
               </select>
             </div>
+          </div>
+
+          <div class="form-group" id="custom-category-group" style="display:none;">
+            <label for="prod-category-custom">Custom Category Name</label>
+            <input type="text" id="prod-category-custom" placeholder="e.g. Pochampally, Gadwal, Patola...">
           </div>
 
           <div class="form-group">
@@ -241,20 +255,27 @@
             <input type="text" id="prod-tagline" required placeholder="e.g. Deep Maroon Heritage Silk">
           </div>
 
+          <!-- SECTION 2: Pricing -->
+          <div class="form-section-label">Pricing</div>
+
           <div class="modal-row">
             <div class="form-group">
-              <label for="prod-price">Retail Price (INR)*</label>
+              <label for="prod-price">Retail Price (₹)*</label>
               <input type="number" id="prod-price" required placeholder="e.g. 24500">
             </div>
             <div class="form-group">
-              <label for="prod-discount">Discount/Special Price (leave empty if none)</label>
+              <label for="prod-discount">Offer / Discount Price (leave empty if none)</label>
               <input type="number" id="prod-discount" placeholder="e.g. 21000">
             </div>
           </div>
 
+          <!-- SECTION 3: Images -->
+          <div class="form-section-label">Images</div>
+
           <div class="form-group">
             <label for="prod-cover">Cover Image URL*</label>
             <input type="url" id="prod-cover" required placeholder="https://images.unsplash.com/photo-...">
+            <div class="img-preview-row" id="cover-preview"></div>
           </div>
 
           <div class="form-group">
@@ -262,29 +283,105 @@
             <textarea id="prod-gallery" rows="3" placeholder="https://images.unsplash.com/photo-1...&#10;https://images.unsplash.com/photo-2..."></textarea>
           </div>
 
+          <!-- SECTION 4: Availability & Badge -->
+          <div class="form-section-label">Availability &amp; Badge</div>
+
           <div class="modal-row">
             <div class="form-group">
-              <label for="prod-badge">Badge (e.g. New Arrival, Limited Edition)</label>
-              <input type="text" id="prod-badge" placeholder="e.g. Limited Edition">
+              <label for="prod-badge">Product Badge</label>
+              <select id="prod-badge">
+                <option value="">— No Badge —</option>
+                <option value="New Arrival">New Arrival</option>
+                <option value="Best Seller">Best Seller</option>
+                <option value="Limited Edition">Limited Edition</option>
+                <option value="Trending">Trending</option>
+                <option value="Exclusive">Exclusive</option>
+                <option value="Festive Special">Festive Special</option>
+                <option value="Bridal Collection">Bridal Collection</option>
+                <option value="Sale">Sale</option>
+              </select>
             </div>
             <div class="form-group">
               <label for="prod-stock">Stock Status</label>
               <select id="prod-stock">
-                <option value="In Stock">In Stock</option>
-                <option value="Low Stock">Low Stock</option>
-                <option value="Out of Stock">Out of Stock</option>
+                <option value="In Stock">✅ In Stock</option>
+                <option value="Low Stock">⚠️ Low Stock</option>
+                <option value="Out of Stock">❌ Out of Stock</option>
+                <option value="Coming Soon">🔜 Coming Soon</option>
+                <option value="Pre-Order">📦 Pre-Order</option>
               </select>
             </div>
           </div>
 
+          <!-- SECTION 5: Sizes (Numeric — in meters) -->
+          <div class="form-section-label">Saree Sizes (in meters)</div>
+          <p class="form-help-text">Select all available sizes for this saree. Each size represents the saree length in meters.</p>
+
+          <div class="size-checkbox-grid" id="size-checkbox-grid">
+            <label class="size-check-item">
+              <input type="checkbox" name="prod-size" value="Free Size" checked> <span>Free Size</span>
+            </label>
+            <label class="size-check-item">
+              <input type="checkbox" name="prod-size" value="5.0m"> <span>5.0 m</span>
+            </label>
+            <label class="size-check-item">
+              <input type="checkbox" name="prod-size" value="5.5m"> <span>5.5 m</span>
+            </label>
+            <label class="size-check-item">
+              <input type="checkbox" name="prod-size" value="6.0m"> <span>6.0 m</span>
+            </label>
+            <label class="size-check-item">
+              <input type="checkbox" name="prod-size" value="6.3m"> <span>6.3 m</span>
+            </label>
+            <label class="size-check-item">
+              <input type="checkbox" name="prod-size" value="6.5m"> <span>6.5 m</span>
+            </label>
+            <label class="size-check-item">
+              <input type="checkbox" name="prod-size" value="7.0m"> <span>7.0 m</span>
+            </label>
+            <label class="size-check-item">
+              <input type="checkbox" name="prod-size" value="8.0m"> <span>8.0 m</span>
+            </label>
+            <label class="size-check-item">
+              <input type="checkbox" name="prod-size" value="9.0m"> <span>9.0 m</span>
+            </label>
+          </div>
+
+          <div class="modal-row mt-16">
+            <div class="form-group">
+              <label for="prod-custom-size">Add Custom Size (optional)</label>
+              <div class="inline-add-row">
+                <input type="text" id="prod-custom-size" placeholder="e.g. 5.2m or 10 yards">
+                <button type="button" class="btn btn-outline btn-sm" onclick="addCustomSize()">+ Add</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hidden field that stores the final sizes string -->
+          <input type="hidden" id="prod-sizes">
+
+          <!-- SECTION 6: Additional Details -->
+          <div class="form-section-label">Additional Details</div>
+
           <div class="modal-row">
             <div class="form-group">
-              <label for="prod-sizes">Sizes (comma separated list)</label>
-              <input type="text" id="prod-sizes" value="Free Size">
+              <label for="prod-blouse">Blouse Details</label>
+              <select id="prod-blouse">
+                <option value="Blouse piece included">Blouse piece included</option>
+                <option value="Blouse piece not included">Blouse piece not included</option>
+                <option value="Running blouse included">Running blouse included</option>
+                <option value="Stitched blouse included">Stitched blouse included</option>
+                <option value="Unstitched blouse included">Unstitched blouse included</option>
+              </select>
             </div>
             <div class="form-group">
-              <label for="prod-blouse">Blouse Details</label>
-              <input type="text" id="prod-blouse" value="Blouse piece included">
+              <label for="prod-care">Fabric &amp; Wash Care</label>
+              <select id="prod-care">
+                <option value="Dry Clean Only">Dry Clean Only</option>
+                <option value="Hand Wash Only">Hand Wash Only</option>
+                <option value="Machine Washable">Machine Washable</option>
+                <option value="Dry Clean Recommended">Dry Clean Recommended</option>
+              </select>
             </div>
           </div>
 
@@ -293,10 +390,6 @@
             <textarea id="prod-desc" rows="3" required placeholder="Describe weaving technique, quality details, etc..."></textarea>
           </div>
 
-          <div class="form-group">
-            <label for="prod-care">Fabric &amp; Wash Care</label>
-            <input type="text" id="prod-care" value="Dry Clean Only">
-          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" onclick="closeProductModal()">Cancel</button>
