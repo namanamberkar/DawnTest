@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swarna Silk — Management Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  
+  <!-- LOGIN CONTAINER -->
+  <div id="login-container" class="login-wrapper">
+    <div class="login-card">
+      <div class="login-logo">Swarna Silk</div>
+      <h2>Store Admin Login</h2>
+      <p>Enter the store password configured in your Google Sheets.</p>
+      
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="admin-pass">Password</label>
+          <input type="password" id="admin-pass" required placeholder="Enter admin password">
+        </div>
+        <div id="login-error" class="error-msg" style="display:none;"></div>
+        <button type="submit" class="btn btn-maroon w-100" id="btn-login">
+          Login Dashboard <i data-lucide="arrow-right"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN WORKSPACE -->
+  <div id="admin-workspace" class="admin-layout" style="display:none;">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        Swarna Silk <span>Admin</span>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" onclick="switchAdminTab('dashboard')" id="tab-btn-dashboard">
+          <i data-lucide="layout-dashboard"></i> Dashboard
+        </button>
+        <button class="nav-item" onclick="switchAdminTab('products')" id="tab-btn-products">
+          <i data-lucide="shirt"></i> Saree Products
+        </button>
+        <button class="nav-item" onclick="switchAdminTab('orders')" id="tab-btn-orders">
+          <i data-lucide="file-text"></i> Customer Orders
+        </button>
+        <button class="nav-item" onclick="switchAdminTab('settings')" id="tab-btn-settings">
+          <i data-lucide="sliders"></i> Settings
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="btn btn-outline w-100 logout-btn" onclick="handleLogout()">
+          <i data-lucide="log-out"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN BODY -->
+    <main class="main-content">
+      
+      <!-- TOP STATUS BAR -->
+      <header class="admin-header">
+        <div class="header-title-wrapper">
+          <h1 id="admin-view-title">Dashboard</h1>
+        </div>
+        <div class="header-profile">
+          <span class="indicator-active"></span> Connected to Google Sheets
+        </div>
+      </header>
+
+      <!-- VIEW: DASHBOARD -->
+      <section id="admin-view-dashboard" class="admin-view active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon icon-products"><i data-lucide="shirt"></i></div>
+            <div class="stat-data">
+              <span class="stat-label">Total Sarees</span>
+              <h3 id="stat-products">0</h3>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon icon-orders"><i data-lucide="shopping-bag"></i></div>
+            <div class="stat-data">
+              <span class="stat-label">Orders Received</span>
+              <h3 id="stat-orders">0</h3>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon icon-revenue"><i data-lucide="indian-rupee"></i></div>
+            <div class="stat-data">
+              <span class="stat-label">Total Revenue</span>
+              <h3 id="stat-revenue">₹0</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-recent-box card-box">
+          <div class="card-box-header">
+            <h3>Quick Actions</h3>
+          </div>
+          <div class="quick-actions-list">
+            <button class="action-tile" onclick="switchAdminTab('products'); openAddProductModal();">
+              <i data-lucide="plus-circle"></i>
+              Add New Saree
+            </button>
+            <button class="action-tile" onclick="switchAdminTab('settings')">
+              <i data-lucide="sliders"></i>
+              Update WhatsApp
+            </button>
+            <button class="action-tile" onclick="window.open('index.html', '_blank')">
+              <i data-lucide="external-link"></i>
+              Open Storefront
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: PRODUCTS LIST -->
+      <section id="admin-view-products" class="admin-view">
+        <div class="action-bar">
+          <div class="search-wrapper">
+            <i data-lucide="search"></i>
+            <input type="text" id="product-search" placeholder="Search sarees..." oninput="renderAdminProducts()">
+          </div>
+          <button class="btn btn-maroon" onclick="openAddProductModal()">
+            <i data-lucide="plus"></i> Add New Saree
+          </button>
+        </div>
+
+        <div class="table-container card-box">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Cover</th>
+                <th>Code</th>
+                <th>Saree Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock Status</th>
+                <th class="actions-col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-products-list">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VIEW: ORDERS -->
+      <section id="admin-view-orders" class="admin-view">
+        <div class="table-container card-box">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Items Ordered</th>
+                <th>Subtotal</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="admin-orders-list">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VIEW: SETTINGS -->
+      <section id="admin-view-settings" class="admin-view">
+        <div class="settings-grid">
+          <div class="card-box">
+            <div class="card-box-header">
+              <h3>Store Settings</h3>
+            </div>
+            <form id="settings-form" onsubmit="saveAdminSettings(event)">
+              <div class="form-group">
+                <label for="set-store-name">Store Display Name</label>
+                <input type="text" id="set-store-name" required>
+              </div>
+              <div class="form-group">
+                <label for="set-whatsapp">WhatsApp Contact (with country code, no + or spaces)</label>
+                <input type="text" id="set-whatsapp" required placeholder="e.g. 919876543210">
+              </div>
+              <div class="form-group">
+                <label for="set-currency">Currency Symbol</label>
+                <input type="text" id="set-currency" required placeholder="e.g. ₹">
+              </div>
+              <div class="form-group">
+                <label for="set-password">Admin Access Password</label>
+                <input type="password" id="set-password" required>
+              </div>
+              <button type="submit" class="btn btn-maroon" id="btn-save-settings">
+                Save Settings
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- PRODUCT EDITOR DIALOG MODAL -->
+  <div id="product-modal" class="modal">
+    <div class="modal-card">
+      <div class="modal-card-header">
+        <h3 id="modal-product-title">Add New Saree</h3>
+        <button class="btn-clear" onclick="closeProductModal()"><i data-lucide="x"></i></button>
+      </div>
+      <form id="product-form" onsubmit="saveProduct(event)">
+        <input type="hidden" id="edit-product-id">
+        <div class="modal-body">
+          <div class="modal-row">
+            <div class="form-group">
+              <label for="prod-name">Saree Name*</label>
+              <input type="text" id="prod-name" required placeholder="e.g. Kanchipuram Silk Saree">
+            </div>
+            <div class="form-group">
+              <label for="prod-category">Category/Fabric Type*</label>
+              <select id="prod-category" required>
+                <option value="Kanchipuram">Kanchipuram</option>
+                <option value="Banarasi">Banarasi</option>
+                <option value="Organza">Organza</option>
+                <option value="Georgette">Georgette</option>
+                <option value="Silk">Silk</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="prod-tagline">Short Tagline (Feature/Color info)*</label>
+            <input type="text" id="prod-tagline" required placeholder="e.g. Deep Maroon Heritage Silk">
+          </div>
+
+          <div class="modal-row">
+            <div class="form-group">
+              <label for="prod-price">Retail Price (INR)*</label>
+              <input type="number" id="prod-price" required placeholder="e.g. 24500">
+            </div>
+            <div class="form-group">
+              <label for="prod-discount">Discount/Special Price (leave empty if none)</label>
+              <input type="number" id="prod-discount" placeholder="e.g. 21000">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="prod-cover">Cover Image URL*</label>
+            <input type="url" id="prod-cover" required placeholder="https://images.unsplash.com/photo-...">
+          </div>
+
+          <div class="form-group">
+            <label>Gallery Images (up to 5 image URLs, one per line)</label>
+            <textarea id="prod-gallery" rows="3" placeholder="https://images.unsplash.com/photo-1...&#10;https://images.unsplash.com/photo-2..."></textarea>
+          </div>
+
+          <div class="modal-row">
+            <div class="form-group">
+              <label for="prod-badge">Badge (e.g. New Arrival, Limited Edition)</label>
+              <input type="text" id="prod-badge" placeholder="e.g. Limited Edition">
+            </div>
+            <div class="form-group">
+              <label for="prod-stock">Stock Status</label>
+              <select id="prod-stock">
+                <option value="In Stock">In Stock</option>
+                <option value="Low Stock">Low Stock</option>
+                <option value="Out of Stock">Out of Stock</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-row">
+            <div class="form-group">
+              <label for="prod-sizes">Sizes (comma separated list)</label>
+              <input type="text" id="prod-sizes" value="Free Size">
+            </div>
+            <div class="form-group">
+              <label for="prod-blouse">Blouse Details</label>
+              <input type="text" id="prod-blouse" value="Blouse piece included">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="prod-desc">Detailed Description*</label>
+            <textarea id="prod-desc" rows="3" required placeholder="Describe weaving technique, quality details, etc..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="prod-care">Fabric &amp; Wash Care</label>
+            <input type="text" id="prod-care" value="Dry Clean Only">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeProductModal()">Cancel</button>
+          <button type="submit" class="btn btn-maroon" id="btn-save-product">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

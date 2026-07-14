@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swarna Silk — Premium Saree Collection</title>
+  <meta name="description" content="Discover India's finest handcrafted sarees. Authentic Kanchipuram, Banarasi, Organza and more.">
+  <!-- Fonts: Assistant / Inter & Playfair Display for accents -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+  <!-- Announcement Bar -->
+  <div class="announcement-bar">
+    <p>FREE SHIPPING ON ALL ORDERS WITHIN INDIA</p>
+  </div>
+
+  <!-- Shopify Header / Nav -->
+  <header class="dawn-header">
+    <div class="header-container">
+      <button class="menu-trigger-btn" onclick="toggleMenu()" aria-label="Menu">
+        <i data-lucide="menu"></i>
+      </button>
+
+      <div class="logo-wrapper">
+        <h1 class="brand-logo" onclick="selectFabricCategory('all')">Swarna Silk</h1>
+      </div>
+
+      <!-- Desktop Nav Menu -->
+      <nav class="desktop-navigation">
+        <a href="#" class="nav-link active" onclick="selectFabricCategory('all')">Home</a>
+        <a href="#" class="nav-link" onclick="selectFabricCategory('Kanchipuram')">Kanchipuram</a>
+        <a href="#" class="nav-link" onclick="selectFabricCategory('Banarasi')">Banarasi</a>
+        <a href="#" class="nav-link" onclick="selectFabricCategory('Organza')">Organza</a>
+        <a href="#" class="nav-link" onclick="selectFabricCategory('Silk')">Silk Weaves</a>
+      </nav>
+
+      <div class="header-icons">
+        <button class="header-icon-btn" onclick="toggleSearchBox()" aria-label="Search">
+          <i data-lucide="search"></i>
+        </button>
+        <button class="header-icon-btn cart-trigger" onclick="toggleCartDrawer()" aria-label="Shopping Bag">
+          <i data-lucide="shopping-bag"></i>
+          <span class="cart-count-badge" id="cart-badge" style="display:none;">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Slide-out Side Drawer Navigation (Mobile) -->
+  <div id="side-drawer" class="mobile-drawer">
+    <div class="mobile-drawer-header">
+      <span class="drawer-brand-logo">Swarna Silk</span>
+      <button class="close-drawer-btn" onclick="toggleMenu()" aria-label="Close menu"><i data-lucide="x"></i></button>
+    </div>
+    <div class="mobile-drawer-nav">
+      <a href="#" class="drawer-nav-item" onclick="selectFabricCategory('all'); toggleMenu()">Home Catalog</a>
+      <a href="#" class="drawer-nav-item" onclick="selectFabricCategory('Kanchipuram'); toggleMenu()">Kanchipuram Silk</a>
+      <a href="#" class="drawer-nav-item" onclick="selectFabricCategory('Banarasi'); toggleMenu()">Banarasi Silk</a>
+      <a href="#" class="drawer-nav-item" onclick="selectFabricCategory('Organza'); toggleMenu()">Delicate Organza</a>
+      <a href="#" class="drawer-nav-item" onclick="selectFabricCategory('Silk'); toggleMenu()">Pure Silk</a>
+    </div>
+  </div>
+  <div id="drawer-overlay" class="drawer-bg-overlay" onclick="toggleMenu()"></div>
+
+  <!-- Dynamic Search bar dropdown -->
+  <div id="header-search-bar" class="header-search-container">
+    <div class="search-inner-wrapper">
+      <i data-lucide="search" class="search-icon-prefix"></i>
+      <input type="text" id="catalog-search" placeholder="Search collection, fabric types..." oninput="renderCatalog()">
+      <button class="btn-clear" onclick="toggleSearchBox()"><i data-lucide="x"></i></button>
+    </div>
+  </div>
+
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <main class="dawn-main-content">
+    
+    <!-- Hero Banner (Shopify style text block layout) -->
+    <section class="banner-section">
+      <div class="banner-media-container">
+        <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1600&q=80" alt="Saree Banner Image" class="banner-img">
+        <div class="banner-overlay-dark"></div>
+      </div>
+      <div class="banner-text-box">
+        <h2>The Heritage Edit</h2>
+        <p>Curated collections of exquisite handloom sarees featuring traditional gold thread work, rich borders, and premium craftsmanship.</p>
+        <button class="btn btn-primary-black" onclick="scrollToCatalog()">SHOP NOW</button>
+      </div>
+    </section>
+
+    <!-- Category Pill list -->
+    <section class="filter-section-container" id="shop-catalog-anchor">
+      <div class="filter-pills-row" id="fabric-pills">
+        <button class="pill-btn active" onclick="filterByFabric('all', this)">All Sarees</button>
+        <button class="pill-btn" onclick="filterByFabric('Kanchipuram', this)">Kanchipuram</button>
+        <button class="pill-btn" onclick="filterByFabric('Banarasi', this)">Banarasi</button>
+        <button class="pill-btn" onclick="filterByFabric('Organza', this)">Organza</button>
+        <button class="pill-btn" onclick="filterByFabric('Georgette', this)">Georgette</button>
+        <button class="pill-btn" onclick="filterByFabric('Silk', this)">Silk</button>
+      </div>
+    </section>
+
+    <!-- Catalog Grid -->
+    <section class="catalog-grid-section">
+      <div id="catalog-loading" class="loading-spinner-state">
+        <div class="loading-ring"></div>
+        <span>Loading collection...</span>
+      </div>
+      <div id="catalog-grid" class="dawn-product-grid" style="display:none;"></div>
+    </section>
+
+  </main>
+
+  <!-- Dynamic Footer Block -->
+  <footer class="dawn-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h3>About Swarna Silk</h3>
+        <p>Curating the finest handcrafted silks and ethnic wear for the modern woman who values tradition, heritage, and minimalism.</p>
+      </div>
+      <div class="footer-col">
+        <h3>Customer Care</h3>
+        <a href="#" onclick="alert('For support queries please order on WhatsApp!')">Contact Us</a>
+        <a href="#" onclick="alert('Free shipping on all domestic deliveries.')">Shipping Details</a>
+        <a href="#" onclick="alert('Standard returns policy is 7 days.')">Returns &amp; Exchanges</a>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <p>&copy; 2026, Swarna Silk. Powered by GAS Database.</p>
+    </div>
+  </footer>
+
+  <!-- Shopify Slide-Out Drawer Cart -->
+  <div id="cart-drawer" class="cart-slide-drawer">
+    <div class="cart-drawer-header">
+      <h2>Your Cart</h2>
+      <button class="close-cart-btn" onclick="toggleCartDrawer()"><i data-lucide="x"></i></button>
+    </div>
+
+    <!-- Empty State -->
+    <div id="bag-empty" class="cart-drawer-empty">
+      <i data-lucide="shopping-bag" class="empty-icon-glyph"></i>
+      <p>Your cart is currently empty.</p>
+      <button class="btn btn-primary-black mt-20" onclick="toggleCartDrawer()">Continue Shopping</button>
+    </div>
+
+    <!-- Filled State -->
+    <div id="bag-filled" class="cart-drawer-filled" style="display:none;">
+      <div id="bag-items-list" class="cart-drawer-items-list">
+        <!-- Rendered via JS -->
+      </div>
+      <div class="cart-drawer-footer">
+        <div class="subtotal-row">
+          <span>Subtotal</span>
+          <span id="summary-subtotal">₹0</span>
+        </div>
+        <p class="shipping-disclaimer">Taxes and shipping calculated at checkout.</p>
+        <button class="btn btn-primary-black w-100 mt-16" onclick="triggerCheckoutFlow()">
+          CHECK OUT
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="cart-overlay" class="drawer-bg-overlay" onclick="toggleCartDrawer()"></div>
+
+  <!-- CHECKOUT MODAL -->
+  <div id="checkout-modal" class="modal">
+    <div class="modal-card">
+      <div class="modal-card-header">
+        <h3>Customer Details</h3>
+        <button class="btn-clear" onclick="closeCheckoutModal()"><i data-lucide="x"></i></button>
+      </div>
+      <p class="modal-desc">Please fill in your billing details below. The order details will be recorded in our database before directing you to WhatsApp.</p>
+      <form id="checkout-form" onsubmit="submitOrder(event)">
+        <div class="form-group">
+          <label for="customer-name">Full Name</label>
+          <input type="text" id="customer-name" required placeholder="Enter full name">
+        </div>
+        <div class="form-group">
+          <label for="customer-phone">WhatsApp Contact Number</label>
+          <input type="tel" id="customer-phone" required placeholder="E.g. +91 98765 43210">
+        </div>
+        <button type="submit" class="btn btn-primary-black w-100" id="btn-submit-order">
+          Confirm Details &amp; Open WhatsApp
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
